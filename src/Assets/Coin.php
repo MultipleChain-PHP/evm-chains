@@ -93,11 +93,11 @@ class Coin implements CoinInterface
             ->setFrom($sender)
             ->setTo($receiver)
             ->setValue($amount)
-            ->setChainId($this->provider->network->getHexId())
+            ->setChainId($this->provider->network->getId())
             ->setGasPrice($this->provider->web3->getGasPrice())
             ->setNonce($this->provider->web3->getNonce($sender));
 
-        $txData->setGasLimit($this->provider->web3->getEstimateGas($txData->toArray()));
+        $txData->setGas($this->provider->web3->getEstimateGas($txData->toArray()));
 
         return new TransactionSigner($txData);
     }

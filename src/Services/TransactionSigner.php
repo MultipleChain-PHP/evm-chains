@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MultipleChain\EvmChains\Services;
 
+use Web3p\EthereumTx\Transaction;
 use MultipleChain\EvmChains\Provider;
 use MultipleChain\EvmChains\TransactionData;
 use MultipleChain\Interfaces\ProviderInterface;
@@ -54,9 +55,8 @@ class TransactionSigner implements TransactionSignerInterface
      */
     public function sign(string $privateKey): TransactionSigner
     {
-        // example implementation
-        $this->provider->isTestnet(); // just for phpstan
-        $this->signedData = 'signedData';
+        $tx = new Transaction($this->rawData->toArray());
+        $this->signedData = '0x' . $tx->sign($privateKey);
         return $this;
     }
 
@@ -65,8 +65,7 @@ class TransactionSigner implements TransactionSignerInterface
      */
     public function send(): string
     {
-        // example implementation
-        return 'transactionId';
+        return $this->provider->web3->sendRawTransaction($this->signedData);
     }
 
     /**

@@ -14,6 +14,12 @@ use phpseclib\Math\BigInteger;
 class Web3 extends Web3Base
 {
     /**
+     * Current time
+     * @var int
+     */
+    private int $time = 0;
+
+    /**
      * @var Net
      */
     public $net;
@@ -41,6 +47,7 @@ class Web3 extends Web3Base
         parent::__construct($rpcUrl, 60);
         $this->net = new Net($rpcUrl, 60);
         $this->eth = new Eth($rpcUrl, 60);
+        $this->time = time();
     }
 
     /**
@@ -50,6 +57,38 @@ class Web3 extends Web3Base
     private function hex(int $value): string
     {
         return '0x' . dechex($value);
+    }
+
+    /**
+     * @param string $signedData
+     * @return string
+     */
+    public function sendRawTransaction(string $signedData): string
+    {
+        try {
+            $transactionId = null;
+            $this->eth->sendRawTransaction($signedData, function ($err, $tx) use (&$transactionId): void {
+                if ($err) {
+                    throw new \Exception($err->getMessage(), $err->getCode());
+                } else {
+                    $transactionId = $tx;
+                }
+            });
+        } catch (\Exception $e) {
+            if ((time() - $this->time) >= 15) {
+                throw new \Exception("Transaction time out!", 16000);
+            } else {
+                if (-32000 == $e->getCode() && 'invalid sender' != $e->getMessage()) {
+                    return $this->sendRawTransaction($signedData);
+                }
+            }
+        }
+
+        if (is_string($transactionId)) {
+            return $transactionId;
+        } else {
+            throw new \Exception("There was a problem retrieving the transaction id!", 13000);
+        }
     }
 
     /**
@@ -104,6 +143,10 @@ class Web3 extends Web3Base
      */
     public function getEstimateGas(array $data): string
     {
+        if (isset($data['chainId']) && is_int($data['chainId'])) {
+            $data['chainId'] = $this->hex($data['chainId']);
+        }
+
         $result = null;
         $this->eth->estimateGas($data, function ($err, $res) use (&$result): void {
             if ($err) {

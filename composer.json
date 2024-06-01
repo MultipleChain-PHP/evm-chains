@@ -29,7 +29,8 @@
     "require": {
         "multiplechain/utils": "^0.1.2",
         "multiplechain/definitions": "^0.1.0",
-        "web3p/web3.php": "^0.3.2"
+        "web3p/web3.php": "^0.3.2",
+        "web3p/ethereum-tx": "^0.4.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5",

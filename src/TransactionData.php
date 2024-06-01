@@ -32,9 +32,9 @@ class TransactionData
     private ?string $gas = null;
 
     /**
-     * @var string|null
+     * @var int|null
      */
-    private ?string $chainId = null;
+    private ?int $chainId = null;
 
     /**
      * @var string|null
@@ -190,10 +190,10 @@ class TransactionData
     }
 
     /**
-     * @param string $chainId
+     * @param int $chainId
      * @return TransactionData
      */
-    public function setChainId(string $chainId): TransactionData
+    public function setChainId(int $chainId): TransactionData
     {
         $this->chainId = $chainId;
         return $this;
@@ -265,9 +265,9 @@ class TransactionData
     }
 
     /**
-     * @return string|null
+     * @return int|null
      */
-    public function getChainId(): ?string
+    public function getChainId(): ?int
     {
         return $this->chainId;
     }
