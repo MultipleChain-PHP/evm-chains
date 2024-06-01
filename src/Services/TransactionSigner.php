@@ -37,12 +37,10 @@ class TransactionSigner implements TransactionSignerInterface
             throw new \RuntimeException('Invalid transaction data');
         }
 
-        if (!is_array($rawData)) {
-            throw new \RuntimeException('Invalid transaction data');
-        }
-
-        // @phpstan-ignore-next-line
         if (!($rawData instanceof TransactionData)) {
+            if (!is_array($rawData)) {
+                throw new \RuntimeException('Raw data must be an array');
+            }
             $rawData = new TransactionData($rawData);
         }
 
@@ -52,9 +50,9 @@ class TransactionSigner implements TransactionSignerInterface
 
     /**
      * @param string $privateKey
-     * @return TransactionSignerInterface
+     * @return TransactionSigner
      */
-    public function sign(string $privateKey): TransactionSignerInterface
+    public function sign(string $privateKey): TransactionSigner
     {
         // example implementation
         $this->provider->isTestnet(); // just for phpstan

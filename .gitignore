@@ -4,6 +4,7 @@ vendor
 test*.php
 .env
 .phpunit.result.cache
+tests/data.json
 
 # Editor directories and files
 .vscode/*

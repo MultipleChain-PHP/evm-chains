@@ -44,10 +44,10 @@ class Web3 extends Web3Base
     }
 
     /**
-     * @param mixed $value
+     * @param int $value
      * @return string
      */
-    private function hex(mixed $value): string
+    private function hex(int $value): string
     {
         return '0x' . dechex($value);
     }
@@ -114,7 +114,7 @@ class Web3 extends Web3Base
         });
 
         if ($result instanceof BigInteger) {
-            return $this->hex($result->toString());
+            return '0x' . $result->toHex();
         } else {
             return $this->hex($this->defaultGas);
         }

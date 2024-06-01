@@ -9,47 +9,47 @@ class TransactionData
     /**
      * @var string|null
      */
-    private ?string $from;
+    private ?string $from = null;
 
     /**
      * @var string|null
      */
-    private ?string $to;
+    private ?string $to = null;
 
     /**
      * @var string|null
      */
-    private ?string $value;
+    private ?string $value = null;
 
     /**
      * @var string|null
      */
-    private ?string $data;
+    private ?string $data = null;
 
     /**
      * @var string|null
      */
-    private ?string $gas;
-
-    /**
-     * @var int|null
-     */
-    private ?int $chainId;
+    private ?string $gas = null;
 
     /**
      * @var string|null
      */
-    private ?string $gasPrice;
+    private ?string $chainId = null;
 
     /**
      * @var string|null
      */
-    private ?string $gasLimit;
+    private ?string $gasPrice = null;
 
     /**
      * @var string|null
      */
-    private ?string $nonce;
+    private ?string $gasLimit = null;
+
+    /**
+     * @var string|null
+     */
+    private ?string $nonce = null;
 
     /**
      * @param array<string,mixed>|null $data
@@ -190,10 +190,10 @@ class TransactionData
     }
 
     /**
-     * @param int $chainId
+     * @param string $chainId
      * @return TransactionData
      */
-    public function setChainId(int $chainId): TransactionData
+    public function setChainId(string $chainId): TransactionData
     {
         $this->chainId = $chainId;
         return $this;
@@ -265,9 +265,9 @@ class TransactionData
     }
 
     /**
-     * @return int|null
+     * @return string|null
      */
-    public function getChainId(): ?int
+    public function getChainId(): ?string
     {
         return $this->chainId;
     }

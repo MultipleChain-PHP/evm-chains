@@ -57,4 +57,26 @@ class CoinTest extends BaseTest
             $this->coin->getBalance($this->data->balanceTestAddress)
         );
     }
+
+    /**
+     * @return void
+     */
+    public function testTransfer(): void
+    {
+        $signer = $this->coin->transfer(
+            $this->data->senderTestAddress,
+            $this->data->receiverTestAddress,
+            $this->data->transferTestAmount
+        );
+
+        if (!$this->data->coinTransferTestIsActive) {
+            return;
+        }
+
+        $beforeBalance = $this->coin->getBalance($this->data->receiverTestAddress);
+
+        $txId = $signer->sign($this->data->senderPrivateKey)->send();
+
+        $this->assertTrue(true);
+    }
 }

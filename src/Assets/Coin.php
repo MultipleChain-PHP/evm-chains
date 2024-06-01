@@ -89,10 +89,11 @@ class Coin implements CoinInterface
         $amount = Utils::numberToHex($amount, $this->getDecimals());
 
         $txData = (new TransactionData())
+            ->setData('')
             ->setFrom($sender)
             ->setTo($receiver)
             ->setValue($amount)
-            ->setChainId($this->provider->network->getId())
+            ->setChainId($this->provider->network->getHexId())
             ->setGasPrice($this->provider->web3->getGasPrice())
             ->setNonce($this->provider->web3->getNonce($sender));
 
