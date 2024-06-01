@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace MultipleChain\EvmChains\Assets;
 
+use phpseclib\Math\BigInteger;
 use Web3\Contract as Web3Contract;
 use MultipleChain\EvmChains\Provider;
 use MultipleChain\EvmChains\TransactionData;
 use MultipleChain\Interfaces\ProviderInterface;
 use MultipleChain\Interfaces\Assets\ContractInterface;
-use phpseclib\Math\BigInteger;
 
 class Contract implements ContractInterface
 {
@@ -31,19 +31,19 @@ class Contract implements ContractInterface
     /**
      * @var array<string,object>
      */
-    public array $abi = [];
+    public array $abi;
 
     /**
      * @param string $address
      * @param Provider|null $provider
-     * @param array<string,object> $abi
+     * @param array<string,object>|null $abi
      */
-    public function __construct(string $address, ?ProviderInterface $provider = null, array $abi = [])
+    public function __construct(string $address, ?ProviderInterface $provider = null, ?array $abi = null)
     {
-        $this->abi = $abi;
+        $this->abi = $abi ?? [];
         $this->address = $address;
         $this->provider = $provider ?? Provider::instance();
-        $this->web3Contract = (new Web3Contract($this->provider->web3->getProvider(), $abi))->at($address);
+        $this->web3Contract = (new Web3Contract($this->provider->web3->getProvider(), $this->abi))->at($address);
     }
 
     /**
@@ -71,6 +71,12 @@ class Contract implements ContractInterface
         };
 
         $this->web3Contract->call($method, ...$args);
+
+        $result = is_array($result) ? array_values($result)[0] : $result;
+
+        if ($result instanceof BigInteger) {
+            return '0x' . $result->toHex();
+        }
 
         return $result;
     }
@@ -117,9 +123,9 @@ class Contract implements ContractInterface
      * @param string $method
      * @param string $from
      * @param mixed ...$args
-     * @return mixed
+     * @return TransactionData
      */
-    public function createTransactionData(string $method, string $from, mixed ...$args): mixed
+    public function createTransactionData(string $method, string $from, mixed ...$args): TransactionData
     {
         $data = $this->getMethodData($method, ...$args);
         $gasPrice = $this->provider->web3->getGasPrice();

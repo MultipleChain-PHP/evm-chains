@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MultipleChain\EvmChains\Models;
 
-use MultipleChain\Utils;
+use MultipleChain\Utils\Number;
 use MultipleChain\Enums\ErrorType;
 use MultipleChain\EvmChains\Provider;
 use MultipleChain\Enums\TransactionType;
@@ -53,18 +53,22 @@ class Transaction implements TransactionInterface
      */
     public function getData(): ?object
     {
-        if (isset($this->data?->response) && isset($this->data?->receipt)) {
+        if (isset($this->data?->response, $this->data?->receipt)) {
             return $this->data;
         }
 
         try {
             $response = $this->provider->web3->getTransaction($this->id);
 
-            if (null === $response) {
+            if (null === $response || empty($response)) {
                 return null;
             }
 
             $receipt = $this->provider->web3->getTransactionReceipt($this->id);
+
+            if (null === $receipt || empty($receipt)) {
+                return null;
+            }
 
             return $this->data = (object) [
                 'response' => (object) $response,
@@ -86,10 +90,8 @@ class Transaction implements TransactionInterface
     {
         try {
             $status = $this->getStatus();
-            if (TransactionStatus::CONFIRMED === $status) {
-                return TransactionStatus::CONFIRMED;
-            } elseif (TransactionStatus::FAILED === $status) {
-                return TransactionStatus::FAILED;
+            if (TransactionStatus::PENDING != $status) {
+                return $status;
             }
 
             sleep($ms / 1000);
@@ -170,20 +172,21 @@ class Transaction implements TransactionInterface
     }
 
     /**
-     * @return float
+     * @return Number
      */
-    public function getFee(): float
+    public function getFee(): Number
     {
         $data = $this->getData();
         $gasUsed = $data?->receipt?->gasUsed ?? null;
         $gasPrice = $data?->response?->gasPrice ?? null;
 
         if (null == $gasUsed || null == $gasUsed) {
-            return 0;
+            return new Number(0);
         }
 
         $decimals = $this->provider->network->getNativeCurrency()['decimals'];
-        return (hexdec($gasPrice) * hexdec($gasUsed)) / pow(10, is_int($decimals) ? $decimals : 18);
+
+        return new Number(hexdec($gasPrice) * hexdec($gasUsed), $decimals);
     }
 
     /**

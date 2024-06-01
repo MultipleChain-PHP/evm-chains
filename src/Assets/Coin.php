@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MultipleChain\EvmChains\Assets;
 
 use MultipleChain\Utils;
+use MultipleChain\Utils\Number;
 use MultipleChain\Enums\ErrorType;
 use MultipleChain\EvmChains\Provider;
 use MultipleChain\EvmChains\TransactionData;
@@ -38,8 +39,7 @@ class Coin implements CoinInterface
      */
     public function getName(): string
     {
-        $name = $this->currency['name'] ?? $this->currency['symbol'];
-        return is_string($name) ? $name : throw new \RuntimeException('Invalid currency name');
+        return $this->currency['name'] ?? $this->currency['symbol'];
     }
 
     /**
@@ -47,8 +47,7 @@ class Coin implements CoinInterface
      */
     public function getSymbol(): string
     {
-        $symbol = $this->currency['symbol'];
-        return is_string($symbol) ? $symbol : throw new \RuntimeException('Invalid currency symbol');
+        return $this->currency['symbol'];
     }
 
     /**
@@ -56,18 +55,17 @@ class Coin implements CoinInterface
      */
     public function getDecimals(): int
     {
-        $decimals = $this->currency['decimals'];
-        return is_int($decimals) ? $decimals : throw new \RuntimeException('Invalid currency decimals');
+        return $this->currency['decimals'];
     }
 
     /**
      * @param string $owner
-     * @return float
+     * @return Number
      */
-    public function getBalance(string $owner): float
+    public function getBalance(string $owner): Number
     {
         $balance = $this->provider->web3->getBalance($owner);
-        return Utils::hexToNumber($balance, $this->getDecimals());
+        return new Number($balance, $this->getDecimals());
     }
 
     /**
@@ -82,7 +80,7 @@ class Coin implements CoinInterface
             throw new \RuntimeException(ErrorType::INVALID_AMOUNT->value);
         }
 
-        if ($amount > $this->getBalance($sender)) {
+        if ($amount > $this->getBalance($sender)->toFloat()) {
             throw new \RuntimeException(ErrorType::INSUFFICIENT_BALANCE->value);
         }
 

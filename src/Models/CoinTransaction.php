@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MultipleChain\EvmChains\Models;
 
+use MultipleChain\Utils\Number;
 use MultipleChain\Enums\AssetDirection;
 use MultipleChain\Enums\TransactionStatus;
 use MultipleChain\Interfaces\Models\CoinTransactionInterface;
@@ -27,11 +28,11 @@ class CoinTransaction extends Transaction implements CoinTransactionInterface
     }
 
     /**
-     * @return float
+     * @return Number
      */
-    public function getAmount(): float
+    public function getAmount(): Number
     {
-        return 0.0;
+        return new Number(0);
     }
 
     /**

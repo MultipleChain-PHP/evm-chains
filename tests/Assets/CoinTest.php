@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace MultipleChain\EvmChains\Tests\Assets;
 
 use MultipleChain\EvmChains\Assets\Coin;
+use MultipleChain\EvmChains\Models\Transaction;
 use MultipleChain\EvmChains\Tests\BaseTest;
+use MultipleChain\Utils\Math;
 
 class CoinTest extends BaseTest
 {
@@ -76,7 +78,9 @@ class CoinTest extends BaseTest
 
         $beforeBalance = $this->coin->getBalance($this->data->receiverTestAddress);
 
-        $txId = $signer->sign($this->data->senderPrivateKey)->send();
+        (new Transaction($signer->sign($this->data->senderPrivateKey)->send()))->wait();
+
+        $afterBalance = $this->coin->getBalance($this->data->receiverTestAddress);
 
         $this->assertTrue(true);
     }

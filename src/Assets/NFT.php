@@ -4,11 +4,26 @@ declare(strict_types=1);
 
 namespace MultipleChain\EvmChains\Assets;
 
+use MultipleChain\Utils\Number;
+use MultipleChain\EvmChains\Provider;
+use MultipleChain\Interfaces\ProviderInterface;
 use MultipleChain\Interfaces\Assets\NftInterface;
 use MultipleChain\EvmChains\Services\TransactionSigner;
 
 class NFT extends Contract implements NftInterface
 {
+    /**
+     * @param string $address
+     * @param Provider|null $provider
+     * @param array<string,object>|null $abi
+     */
+    public function __construct(string $address, ?ProviderInterface $provider = null, ?array $abi = null)
+    {
+        $dir = dirname(__DIR__, 2) . '/resources/ERC721.json';
+        $erc721Abi = json_decode(file_get_contents($dir) ?: '', true);
+        parent::__construct($address, $provider, $abi ?? $erc721Abi);
+    }
+
     /**
      * @return string
      */
@@ -27,11 +42,11 @@ class NFT extends Contract implements NftInterface
 
     /**
      * @param string $owner
-     * @return float
+     * @return Number
      */
-    public function getBalance(string $owner): float
+    public function getBalance(string $owner): Number
     {
-        return 0.0;
+        return new Number(0);
     }
 
     /**

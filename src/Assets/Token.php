@@ -4,17 +4,34 @@ declare(strict_types=1);
 
 namespace MultipleChain\EvmChains\Assets;
 
+use MultipleChain\Utils;
+use MultipleChain\Utils\Number;
+use MultipleChain\Enums\ErrorType;
+use MultipleChain\EvmChains\Provider;
+use MultipleChain\Interfaces\ProviderInterface;
 use MultipleChain\Interfaces\Assets\TokenInterface;
 use MultipleChain\EvmChains\Services\TransactionSigner;
 
 class Token extends Contract implements TokenInterface
 {
     /**
+     * @param string $address
+     * @param Provider|null $provider
+     * @param array<string,object>|null $abi
+     */
+    public function __construct(string $address, ?ProviderInterface $provider = null, ?array $abi = null)
+    {
+        $dir = dirname(__DIR__, 2) . '/resources/ERC20.json';
+        $erc20Abi = json_decode(file_get_contents($dir) ?: '', true);
+        parent::__construct($address, $provider, $abi ?? $erc20Abi);
+    }
+
+    /**
      * @return string
      */
     public function getName(): string
     {
-        return 'Token';
+        return $this->callMethod('name');
     }
 
     /**
@@ -22,7 +39,7 @@ class Token extends Contract implements TokenInterface
      */
     public function getSymbol(): string
     {
-        return 'TOKEN';
+        return $this->callMethod('symbol');
     }
 
     /**
@@ -30,34 +47,40 @@ class Token extends Contract implements TokenInterface
      */
     public function getDecimals(): int
     {
-        return 18;
+        return (int) hexdec($this->callMethod('decimals'));
     }
 
     /**
      * @param string $owner
-     * @return float
+     * @return Number
      */
-    public function getBalance(string $owner): float
+    public function getBalance(string $owner): Number
     {
-        return 0.0;
+        $decimals = $this->getDecimals();
+        $balance = $this->callMethod('balanceOf', $owner);
+        return new Number($balance, $decimals);
     }
 
     /**
-     * @return float
+     * @return Number
      */
-    public function getTotalSupply(): float
+    public function getTotalSupply(): Number
     {
-        return 0.0;
+        $decimals = $this->getDecimals();
+        $totalSupply = $this->callMethod('totalSupply');
+        return new Number($totalSupply, $decimals);
     }
 
     /**
      * @param string $owner
      * @param string $spender
-     * @return float
+     * @return Number
      */
-    public function getAllowance(string $owner, string $spender): float
+    public function getAllowance(string $owner, string $spender): Number
     {
-        return 0.0;
+        $decimals = $this->getDecimals();
+        $allowance = $this->callMethod('allowance', $owner, $spender);
+        return new Number($allowance, $decimals);
     }
 
     /**
@@ -68,7 +91,19 @@ class Token extends Contract implements TokenInterface
      */
     public function transfer(string $sender, string $receiver, float $amount): TransactionSigner
     {
-        return new TransactionSigner('example');
+        if ($amount < 0) {
+            throw new \RuntimeException(ErrorType::INVALID_AMOUNT->value);
+        }
+
+        if ($amount > $this->getBalance($sender)->toFloat()) {
+            throw new \RuntimeException(ErrorType::INSUFFICIENT_BALANCE->value);
+        }
+
+        $amount = Utils::numberToHex($amount, $this->getDecimals());
+
+        return new TransactionSigner(
+            $this->createTransactionData('transfer', $sender, $receiver, $amount)
+        );
     }
 
     /**
@@ -84,7 +119,29 @@ class Token extends Contract implements TokenInterface
         string $receiver,
         float $amount
     ): TransactionSigner {
-        return new TransactionSigner('example');
+        if ($amount < 0) {
+            throw new \RuntimeException(ErrorType::INVALID_AMOUNT->value);
+        }
+
+        if ($amount > $this->getBalance($owner)->toFloat()) {
+            throw new \RuntimeException(ErrorType::INSUFFICIENT_BALANCE->value);
+        }
+
+        $allowance = $this->getAllowance($owner, $spender)->toFloat();
+
+        if (0 == $allowance) {
+            throw new \RuntimeException(ErrorType::UNAUTHORIZED_ADDRESS->value);
+        }
+
+        if ($amount > $allowance) {
+            throw new \RuntimeException(ErrorType::INVALID_AMOUNT->value);
+        }
+
+        $amount = Utils::numberToHex($amount, $this->getDecimals());
+
+        return new TransactionSigner(
+            $this->createTransactionData('transferFrom', $spender, $owner, $receiver, $amount)
+        );
     }
 
     /**
@@ -95,6 +152,18 @@ class Token extends Contract implements TokenInterface
      */
     public function approve(string $owner, string $spender, float $amount): TransactionSigner
     {
-        return new TransactionSigner('example');
+        if ($amount < 0) {
+            throw new \RuntimeException(ErrorType::INVALID_AMOUNT->value);
+        }
+
+        if ($amount > $this->getBalance($owner)->toFloat()) {
+            throw new \RuntimeException(ErrorType::INSUFFICIENT_BALANCE->value);
+        }
+
+        $amount = Utils::numberToHex($amount, $this->getDecimals());
+
+        return new TransactionSigner(
+            $this->createTransactionData('approve', $owner, $spender, $amount)
+        );
     }
 }
