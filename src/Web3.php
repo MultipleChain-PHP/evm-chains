@@ -32,12 +32,12 @@ class Web3 extends Web3Base
     /**
      * @var int
      */
-    private $defaultGasPrice = 10000000000;
+    public $defaultGasPrice = 10000000000;
 
     /**
      * @var int
      */
-    private $defaultNonce = 1;
+    public $defaultNonce = 1;
 
     /**
      * @param string $rpcUrl

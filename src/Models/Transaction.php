@@ -21,9 +21,9 @@ class Transaction implements TransactionInterface
     private string $id;
 
     /**
-     * @var mixed
+     * @var object
      */
-    private mixed $data = null;
+    private ?object $data = null;
 
     /**
      * @var Provider
@@ -49,9 +49,9 @@ class Transaction implements TransactionInterface
     }
 
     /**
-     * @return mixed
+     * @return object|null
      */
-    public function getData(): mixed
+    public function getData(): ?object
     {
         if (isset($this->data?->response) && isset($this->data?->receipt)) {
             return $this->data;
@@ -121,21 +121,24 @@ class Transaction implements TransactionInterface
 
         $data = $this->getData();
 
-        if (null === $data) {
+        if (null == $data) {
             return TransactionType::GENERAL;
         }
 
-        $byteCode = $this->provider->web3->getByteCode($data->response?->to ?? '');
+        $to = $data->response?->to ?? '';
+        $input = $data->response?->input ?? '';
 
-        if ('0x' === $byteCode || '0x' === $data->response?->input) {
+        $byteCode = $this->provider->web3->getByteCode($to);
+
+        if ('0x' === $byteCode || '0x' === $input) {
             return TransactionType::COIN;
         }
 
-        $selectorId = substr($data->response?->input, 0, 10);
+        $selectorId = substr($input, 0, 10);
 
         if (in_array($selectorId, $selectors)) {
             try {
-                $nft = new NFT($data->response?->to ?? '');
+                $nft = new NFT($to);
                 $nft->getApproved(1);
                 return TransactionType::NFT;
             } catch (\Throwable $th) {
@@ -172,15 +175,15 @@ class Transaction implements TransactionInterface
     public function getFee(): float
     {
         $data = $this->getData();
-        if (null == $data?->response?->gasPrice || null == $data?->receipt?->gasUsed) {
+        $gasUsed = $data?->receipt?->gasUsed ?? null;
+        $gasPrice = $data?->response?->gasPrice ?? null;
+
+        if (null == $gasUsed || null == $gasUsed) {
             return 0;
         }
 
-        $gasUsed = hexdec($data->receipt->gasUsed);
-        $gasPrice = hexdec($data->response->gasPrice);
         $decimals = $this->provider->network->getNativeCurrency()['decimals'];
-
-        return ($gasPrice * $gasUsed) / pow(10, $decimals);
+        return (hexdec($gasPrice) * hexdec($gasUsed)) / pow(10, is_int($decimals) ? $decimals : 18);
     }
 
     /**
@@ -189,10 +192,14 @@ class Transaction implements TransactionInterface
     public function getBlockNumber(): int
     {
         $data = $this->getData();
-        if (null == $data?->response?->blockNumber) {
+
+        $blockNumber = $data?->response?->blockNumber ?? null;
+
+        if (null == $blockNumber) {
             return 0;
         }
-        return hexdec($data->response->blockNumber);
+
+        return (int) hexdec($blockNumber);
     }
 
     /**
@@ -202,7 +209,7 @@ class Transaction implements TransactionInterface
     {
         $blockNumber = $this->getBlockNumber();
         $block = $this->provider->web3->getBlockByNumber($blockNumber);
-        return hexdec($block->timestamp);
+        return (int) hexdec($block->timestamp ?? 0);
     }
 
     /**
@@ -222,10 +229,13 @@ class Transaction implements TransactionInterface
     public function getStatus(): TransactionStatus
     {
         $data = $this->getData();
+        $receipt = $data?->receipt ?? null;
+        $blockNumber = $data?->response?->blockNumber ?? null;
+
         if (null === $data) {
             return TransactionStatus::PENDING;
-        } elseif (null !== $data->response?->blockNumber && null !== $data->receipt) {
-            if ('0x1' === $data->receipt->status) {
+        } elseif (null !== $blockNumber && null !== $receipt) {
+            if ('0x1' === $receipt->status) {
                 return TransactionStatus::CONFIRMED;
             } else {
                 return TransactionStatus::FAILED;
