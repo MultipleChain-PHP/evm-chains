@@ -6,10 +6,14 @@ namespace MultipleChain\EvmChains;
 
 use MultipleChain\Enums\ErrorType;
 use MultipleChain\Interfaces\ProviderInterface;
-use MultipleChain\BaseNetworkConfig as NetworkConfig;
 
 class Provider implements ProviderInterface
 {
+    /**
+     * @var Web3
+     */
+    public Web3 $web3;
+
     /**
      * @var NetworkConfig
      */
@@ -59,6 +63,7 @@ class Provider implements ProviderInterface
     {
         self::$instance = $this;
         $this->network = new NetworkConfig($network);
+        $this->web3 = new Web3($this->network->getRpcUrl());
     }
 
     /**
@@ -75,7 +80,7 @@ class Provider implements ProviderInterface
      */
     public function checkRpcConnection(?string $url = null): bool
     {
-        return true;
+        return boolval($this->web3->getChainId());
     }
 
     /**
