@@ -15,10 +15,17 @@ class BaseTest extends TestCase
     protected Provider $provider;
 
     /**
+     * @var object
+     */
+    protected object $data;
+
+    /**
      * @return void
      */
     public function setUp(): void
     {
+        $this->data = json_decode(file_get_contents(__DIR__ . '/data.json'));
+
         $this->provider = new Provider([
             'id' => 11155111,
             'hexId' => '0xaa36a7',

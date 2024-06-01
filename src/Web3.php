@@ -38,9 +38,9 @@ class Web3 extends Web3Base
      */
     public function __construct(string $rpcUrl)
     {
-        parent::__construct($rpcUrl);
-        $this->net = new Net($rpcUrl);
-        $this->eth = new Eth($rpcUrl);
+        parent::__construct($rpcUrl, 60);
+        $this->net = new Net($rpcUrl, 60);
+        $this->eth = new Eth($rpcUrl, 60);
     }
 
     /**

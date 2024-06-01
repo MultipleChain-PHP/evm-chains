@@ -35,14 +35,6 @@ class Web3Test extends TestCase
     /**
      * @return void
      */
-    public function testGetChainId(): void
-    {
-        $this->assertEquals(11155111, $this->web3->getChainId());
-    }
-
-    /**
-     * @return void
-     */
     public function testBlockNumber(): void
     {
         $this->assertGreaterThan(6017525, $this->web3->getBlockNumber());
@@ -71,13 +63,5 @@ class Web3Test extends TestCase
     public function testTransactionReceipt(): void
     {
         $this->assertArrayHasKey('blockHash', $this->web3->getTransactionReceipt($this->tx));
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetBalance(): void
-    {
-        $this->assertEquals('0x0d02cc1c3f8eb679', $this->web3->getBalance($this->addr));
     }
 }

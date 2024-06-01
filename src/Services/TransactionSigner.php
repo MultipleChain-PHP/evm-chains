@@ -5,20 +5,21 @@ declare(strict_types=1);
 namespace MultipleChain\EvmChains\Services;
 
 use MultipleChain\EvmChains\Provider;
+use MultipleChain\EvmChains\TransactionData;
 use MultipleChain\Interfaces\ProviderInterface;
 use MultipleChain\Interfaces\Services\TransactionSignerInterface;
 
 class TransactionSigner implements TransactionSignerInterface
 {
     /**
-     * @var mixed
+     * @var TransactionData
      */
-    private mixed $rawData;
+    private TransactionData $rawData;
 
     /**
-     * @var mixed
+     * @var string
      */
-    private mixed $signedData;
+    private string $signedData;
 
     /**
      * @var Provider
@@ -32,6 +33,19 @@ class TransactionSigner implements TransactionSignerInterface
      */
     public function __construct(mixed $rawData, ?ProviderInterface $provider = null)
     {
+        if (null === $rawData) {
+            throw new \RuntimeException('Invalid transaction data');
+        }
+
+        if (!is_array($rawData)) {
+            throw new \RuntimeException('Invalid transaction data');
+        }
+
+        // @phpstan-ignore-next-line
+        if (!($rawData instanceof TransactionData)) {
+            $rawData = new TransactionData($rawData);
+        }
+
         $this->rawData = $rawData;
         $this->provider = $provider ?? Provider::instance();
     }
@@ -58,7 +72,7 @@ class TransactionSigner implements TransactionSignerInterface
     }
 
     /**
-     * @return mixed
+     * @return TransactionData
      */
     public function getRawData(): mixed
     {
@@ -66,9 +80,9 @@ class TransactionSigner implements TransactionSignerInterface
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getSignedData(): mixed
+    public function getSignedData(): string
     {
         return $this->signedData;
     }

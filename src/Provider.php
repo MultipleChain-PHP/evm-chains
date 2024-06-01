@@ -80,7 +80,27 @@ class Provider implements ProviderInterface
      */
     public function checkRpcConnection(?string $url = null): bool
     {
-        return boolval($this->web3->getChainId());
+        try {
+            $curl = curl_init($url ?? $this->network->getRpcUrl());
+            if (false === $curl) {
+                return false;
+            }
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_POST, true);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode([
+                'jsonrpc' => '2.0',
+                'method' => 'eth_blockNumber',
+                'params' => [],
+                'id' => 1,
+            ]));
+            curl_exec($curl);
+            $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+            return 200 === $httpCode;
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 
     /**
@@ -89,6 +109,6 @@ class Provider implements ProviderInterface
      */
     public function checkWsConnection(?string $url = null): bool
     {
-        return true;
+        return boolval($url ?? $this->network->getWsUrl() ?? '');
     }
 }
