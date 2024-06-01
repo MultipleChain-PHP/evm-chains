@@ -117,6 +117,28 @@ class Web3 extends Web3Base
     }
 
     /**
+     * @param int $blockNumber
+     * @return object
+     */
+    public function getBlockByNumber(int $blockNumber): object
+    {
+        $block = null;
+        $this->eth->getBlockByNumber($this->hex($blockNumber), false, function ($err, $res) use (&$block): void {
+            if ($err) {
+                throw new \Exception($err->getMessage(), $err->getCode());
+            } else {
+                $block = (object) $res;
+            }
+        });
+
+        if (is_object($block)) {
+            return $block;
+        } else {
+            throw new \Exception("There was a problem retrieving the block!", 14000);
+        }
+    }
+
+    /**
      * @return integer
      */
     public function getBlockNumber(): int
@@ -247,6 +269,28 @@ class Web3 extends Web3Base
             return $result;
         } else {
             return null;
+        }
+    }
+
+    /**
+     * @param string $address
+     * @return string
+     */
+    public function getByteCode(string $address): string
+    {
+        $result = null;
+        $this->eth->getCode($address, 'latest', function ($err, $res) use (&$result): void {
+            if ($err) {
+                throw new \Exception($err->getMessage(), $err->getCode());
+            } else {
+                $result = $res;
+            }
+        });
+
+        if (is_string($result)) {
+            return $result;
+        } else {
+            return '0x';
         }
     }
 
