@@ -56,7 +56,7 @@ class CoinTest extends BaseTest
     {
         $this->assertEquals(
             $this->data->coinBalanceTestAmount,
-            $this->coin->getBalance($this->data->balanceTestAddress)
+            $this->coin->getBalance($this->data->balanceTestAddress)->toFloat()
         );
     }
 

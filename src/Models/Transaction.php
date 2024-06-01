@@ -185,8 +185,7 @@ class Transaction implements TransactionInterface
         }
 
         $decimals = $this->provider->network->getNativeCurrency()['decimals'];
-
-        return new Number(hexdec($gasPrice) * hexdec($gasUsed), $decimals);
+        return new Number((hexdec($gasPrice) * hexdec($gasUsed)) / pow(10, $decimals));
     }
 
     /**

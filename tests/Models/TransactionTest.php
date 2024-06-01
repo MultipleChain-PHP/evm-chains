@@ -81,7 +81,7 @@ class TransactionTest extends BaseTest
      */
     public function testFee(): void
     {
-        $this->assertEquals(0.000371822357865, $this->tx->getFee());
+        $this->assertEquals(0.000371822357865, $this->tx->getFee()->toFloat());
     }
 
     /**
