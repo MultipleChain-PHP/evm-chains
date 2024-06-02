@@ -21,7 +21,7 @@ jobs:
           php-version: '8.1'
 
       - name: Create data.json file
-        run: cp tests/data.json.example tests/data.json
+        run: cp tests/data.example.json tests/data.json
 
       - name: Install dependencies
         run: |
