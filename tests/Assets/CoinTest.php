@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MultipleChain\EvmChains\Tests\Assets;
 
+use MultipleChain\Utils\Number;
 use MultipleChain\EvmChains\Assets\Coin;
-use MultipleChain\EvmChains\Models\Transaction;
 use MultipleChain\EvmChains\Tests\BaseTest;
-use MultipleChain\Utils\Math;
+use MultipleChain\EvmChains\Models\Transaction;
 
 class CoinTest extends BaseTest
 {
@@ -82,6 +82,11 @@ class CoinTest extends BaseTest
 
         $afterBalance = $this->coin->getBalance($this->data->receiverTestAddress);
 
-        $this->assertTrue(true);
+        $transferNumber = new Number($this->data->transferTestAmount);
+
+        $this->assertEquals(
+            $afterBalance->toString(),
+            $beforeBalance->add($transferNumber)->toString()
+        );
     }
 }

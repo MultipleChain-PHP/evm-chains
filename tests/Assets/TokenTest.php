@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MultipleChain\EvmChains\Tests\Assets;
 
+use MultipleChain\Utils\Number;
 use MultipleChain\EvmChains\Assets\Token;
-use MultipleChain\EvmChains\Models\Transaction;
 use MultipleChain\EvmChains\Tests\BaseTest;
-use MultipleChain\Utils\Math;
+use MultipleChain\EvmChains\Models\Transaction;
 
 class TokenTest extends BaseTest
 {
@@ -93,7 +93,12 @@ class TokenTest extends BaseTest
 
         $afterBalance = $this->token->getBalance($this->data->receiverTestAddress);
 
-        $this->assertTrue(true);
+        $transferNumber = new Number($this->data->tokenTransferTestAmount, $this->token->getDecimals());
+
+        $this->assertEquals(
+            $afterBalance->toString(),
+            $beforeBalance->add($transferNumber)->toString()
+        );
     }
 
     /**
@@ -120,8 +125,8 @@ class TokenTest extends BaseTest
         );
 
         $this->assertEquals(
-            $this->data->tokenTransferTestAmount,
-            $allowance
+            $this->data->tokenApproveTestAmount,
+            $allowance->toFloat()
         );
     }
 
@@ -148,6 +153,9 @@ class TokenTest extends BaseTest
 
         $afterBalance = $this->token->getBalance($this->data->receiverTestAddress);
 
-        $this->assertTrue(true);
+        $this->assertEquals(
+            $afterBalance->toString(),
+            $beforeBalance->add(new Number(2))->toString()
+        );
     }
 }

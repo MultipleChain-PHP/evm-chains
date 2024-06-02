@@ -10,7 +10,7 @@
     "coinBalanceTestAmount": 0.01,
     "tokenBalanceTestAmount": 1000,
     "nftBalanceTestAmount": 2,
-    "transferTestAmount": 0.01,
+    "transferTestAmount": 0.0001,
     "tokenTransferTestAmount": 1,
     "tokenApproveTestAmount": 100,
     "nftTransferId": 7,

@@ -130,15 +130,15 @@ class Contract implements ContractInterface
         $data = $this->getMethodData($method, ...$args);
         $gasPrice = $this->provider->web3->getGasPrice();
         $nonce = $this->provider->web3->getNonce($from);
-        $gasLimit = $this->getMethodEstimateGas($method, $from, ...$args);
+        $gas = $this->getMethodEstimateGas($method, $from, ...$args);
 
         return new TransactionData([
             'value' => '0x0',
+            'gas' => $gas,
             'from' => $from,
             'data' => $data,
             'nonce' => $nonce,
             'gasPrice' => $gasPrice,
-            'gasLimit' => $gasLimit,
             'to' => $this->getAddress(),
             'chainId' => $this->provider->network->getId()
         ]);

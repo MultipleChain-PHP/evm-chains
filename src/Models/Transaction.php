@@ -58,15 +58,11 @@ class Transaction implements TransactionInterface
         }
 
         try {
-            $response = $this->provider->web3->getTransaction($this->id);
-
-            if (null === $response || empty($response)) {
+            if (empty($response = $this->provider->web3->getTransaction($this->id))) {
                 return null;
             }
 
-            $receipt = $this->provider->web3->getTransactionReceipt($this->id);
-
-            if (null === $receipt || empty($receipt)) {
+            if (empty($receipt = $this->provider->web3->getTransactionReceipt($this->id))) {
                 return null;
             }
 
