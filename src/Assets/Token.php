@@ -17,13 +17,15 @@ class Token extends Contract implements TokenInterface
     /**
      * @param string $address
      * @param Provider|null $provider
-     * @param array<string,object>|null $abi
+     * @param array<object>|null $abi
      */
     public function __construct(string $address, ?ProviderInterface $provider = null, ?array $abi = null)
     {
-        $dir = dirname(__DIR__, 2) . '/resources/ERC20.json';
-        $erc20Abi = json_decode(file_get_contents($dir) ?: '', true);
-        parent::__construct($address, $provider, $abi ?? $erc20Abi);
+        parent::__construct(
+            $address,
+            $provider,
+            $abi ? $abi : json_decode(file_get_contents(dirname(__DIR__, 2) . '/resources/ERC20.json') ?: '')
+        );
     }
 
     /**

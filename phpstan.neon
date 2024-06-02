@@ -4,3 +4,4 @@ parameters:
         - src
     excludePaths:
         - src/Web3.php
+        - src/AbiDecoder.php

@@ -29,14 +29,14 @@ class Contract implements ContractInterface
     public Web3Contract $web3Contract;
 
     /**
-     * @var array<string,object>
+     * @var array<object>
      */
     public array $abi;
 
     /**
      * @param string $address
      * @param Provider|null $provider
-     * @param array<string,object>|null $abi
+     * @param array<object>|null $abi
      */
     public function __construct(string $address, ?ProviderInterface $provider = null, ?array $abi = null)
     {
@@ -73,6 +73,10 @@ class Contract implements ContractInterface
         $this->web3Contract->call($method, ...$args);
 
         $result = is_array($result) ? array_values($result)[0] : $result;
+
+        if ($result instanceof BigInteger) {
+            return '0x' . $result->toHex();
+        }
 
         return $result;
     }
