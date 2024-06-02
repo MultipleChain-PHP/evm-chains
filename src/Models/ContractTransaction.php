@@ -43,6 +43,9 @@ class ContractTransaction extends Transaction implements ContractTransactionInte
     public function decodeData(?object $response = null): ?object
     {
         if (is_null($response)) {
+            /**
+             * @var null|object{'response': object} $data
+             */
             $data = $this->getData();
             if (is_null($data)) {
                 return null;
@@ -51,6 +54,9 @@ class ContractTransaction extends Transaction implements ContractTransactionInte
         }
 
         $decoder = new AbiDecoder($this->abi);
+        /**
+         * @var object{'input': string} $response
+         */
         return $decoder->decodeInput($response->input);
     }
 }

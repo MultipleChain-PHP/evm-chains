@@ -16,13 +16,15 @@ class NFT extends Contract implements NftInterface
     /**
      * @param string $address
      * @param Provider|null $provider
-     * @param array<string,object>|null $abi
+     * @param array<object>|null $abi
      */
     public function __construct(string $address, ?ProviderInterface $provider = null, ?array $abi = null)
     {
-        $dir = dirname(__DIR__, 2) . '/resources/ERC721.json';
-        $erc721Abi = json_decode(file_get_contents($dir) ?: '', true);
-        parent::__construct($address, $provider, $abi ?? $erc721Abi);
+        parent::__construct(
+            $address,
+            $provider,
+            $abi ? $abi : json_decode(file_get_contents(dirname(__DIR__, 2) . '/resources/ERC721.json') ?: '')
+        );
     }
 
     /**

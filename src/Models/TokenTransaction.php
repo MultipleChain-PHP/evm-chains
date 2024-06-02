@@ -33,6 +33,9 @@ class TokenTransaction extends ContractTransaction implements TokenTransactionIn
      */
     public function getReceiver(): string
     {
+        /**
+         * @var null|object{'name': string, 'args': array<int,object>} $decoded
+         */
         $decoded = $this->decodeData();
 
         if (is_null($decoded)) {
@@ -40,9 +43,11 @@ class TokenTransaction extends ContractTransaction implements TokenTransactionIn
         }
 
         if ('transferFrom' === $decoded->name) {
+            // @phpstan-ignore-next-line
             return $decoded->args[1]->value;
         }
 
+        // @phpstan-ignore-next-line
         return $decoded->args[0]->value;
     }
 
@@ -51,6 +56,9 @@ class TokenTransaction extends ContractTransaction implements TokenTransactionIn
      */
     public function getSender(): string
     {
+        /**
+         * @var null|object{'name': string, 'args': array<int,object>} $decoded
+         */
         $decoded = $this->decodeData();
 
         if (is_null($decoded)) {
@@ -58,6 +66,7 @@ class TokenTransaction extends ContractTransaction implements TokenTransactionIn
         }
 
         if ('transferFrom' === $decoded->name) {
+            // @phpstan-ignore-next-line
             return $decoded->args[0]->value;
         }
 
@@ -77,10 +86,13 @@ class TokenTransaction extends ContractTransaction implements TokenTransactionIn
 
         $token = new Token($this->getAddress());
 
+        // @phpstan-ignore-next-line
         if ('transferFrom' === $decoded->name) {
+            // @phpstan-ignore-next-line
             return new Number($decoded->args[2]->value, $token->getDecimals());
         }
 
+        // @phpstan-ignore-next-line
         return new Number($decoded->args[1]->value, $token->getDecimals());
     }
 
