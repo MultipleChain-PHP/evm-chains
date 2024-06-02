@@ -20,6 +20,9 @@ jobs:
         with:
           php-version: '8.1'
 
+      - name: Create data.json file
+        run: cp tests/data.json.example tests/data.json
+
       - name: Install dependencies
         run: |
           composer install
