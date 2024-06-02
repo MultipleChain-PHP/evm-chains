@@ -16,7 +16,8 @@ class CoinTransaction extends Transaction implements CoinTransactionInterface
      */
     public function getReceiver(): string
     {
-        return '0x';
+        $data = $this->getData();
+        return $data?->response?->to ?? '';
     }
 
     /**
@@ -24,7 +25,7 @@ class CoinTransaction extends Transaction implements CoinTransactionInterface
      */
     public function getSender(): string
     {
-        return '0x';
+        return $this->getSigner();
     }
 
     /**
@@ -32,7 +33,8 @@ class CoinTransaction extends Transaction implements CoinTransactionInterface
      */
     public function getAmount(): Number
     {
-        return new Number(0);
+        $data = $this->getData();
+        return new Number($data?->response?->value ?? '', $this->currencyDecimals);
     }
 
     /**
@@ -43,6 +45,26 @@ class CoinTransaction extends Transaction implements CoinTransactionInterface
      */
     public function verifyTransfer(AssetDirection $direction, string $address, float $amount): TransactionStatus
     {
-        return TransactionStatus::PENDING;
+        $status = $this->getStatus();
+
+        if (TransactionStatus::PENDING === $status) {
+            return TransactionStatus::PENDING;
+        }
+
+        if ($this->getAmount()->toString() != (string) $amount) {
+            return TransactionStatus::FAILED;
+        }
+
+        if (AssetDirection::INCOMING === $direction) {
+            if (strtolower($this->getReceiver()) !== strtolower($address)) {
+                return TransactionStatus::FAILED;
+            }
+        } else {
+            if (strtolower($this->getSender()) !== strtolower($address)) {
+                return TransactionStatus::FAILED;
+            }
+        }
+
+        return TransactionStatus::CONFIRMED;
     }
 }

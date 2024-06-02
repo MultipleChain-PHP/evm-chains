@@ -31,6 +31,11 @@ class Transaction implements TransactionInterface
     private Provider $provider;
 
     /**
+     * @var int
+     */
+    protected int $currencyDecimals;
+
+    /**
      * @param string $id
      * @param Provider|null $provider
      */
@@ -38,6 +43,7 @@ class Transaction implements TransactionInterface
     {
         $this->id = $id;
         $this->provider = $provider ?? Provider::instance();
+        $this->currencyDecimals = $this->provider->network->getNativeCurrency()['decimals'];
     }
 
     /**
@@ -180,8 +186,7 @@ class Transaction implements TransactionInterface
             return new Number(0);
         }
 
-        $decimals = $this->provider->network->getNativeCurrency()['decimals'];
-        return new Number((hexdec($gasPrice) * hexdec($gasUsed)) / pow(10, $decimals));
+        return new Number((hexdec($gasPrice) * hexdec($gasUsed)) / pow(10, $this->currencyDecimals));
     }
 
     /**

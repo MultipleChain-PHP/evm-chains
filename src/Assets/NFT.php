@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MultipleChain\EvmChains\Assets;
 
 use MultipleChain\Utils\Number;
+use MultipleChain\Enums\ErrorType;
 use MultipleChain\EvmChains\Provider;
 use MultipleChain\Interfaces\ProviderInterface;
 use MultipleChain\Interfaces\Assets\NftInterface;
@@ -112,7 +113,7 @@ class NFT extends Contract implements NftInterface
         }
 
         if (strtolower($spender) !== strtolower($owner)) {
-            $approved = $this->getApproved($tokenId);
+            $approved = $this->getApproved($tokenId) ?? '';
             if (strtolower($approved) !== strtolower($spender)) {
                 throw new \RuntimeException(ErrorType::UNAUTHORIZED_ADDRESS->value);
             }
