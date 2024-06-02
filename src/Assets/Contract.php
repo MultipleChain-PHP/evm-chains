@@ -74,10 +74,6 @@ class Contract implements ContractInterface
 
         $result = is_array($result) ? array_values($result)[0] : $result;
 
-        if ($result instanceof BigInteger) {
-            return '0x' . $result->toHex();
-        }
-
         return $result;
     }
 

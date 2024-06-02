@@ -29,7 +29,7 @@ class NFT extends Contract implements NftInterface
      */
     public function getName(): string
     {
-        return 'NFT';
+        return $this->callMethod('name');
     }
 
     /**
@@ -37,7 +37,7 @@ class NFT extends Contract implements NftInterface
      */
     public function getSymbol(): string
     {
-        return 'NFT';
+        return $this->callMethod('symbol');
     }
 
     /**
@@ -46,7 +46,7 @@ class NFT extends Contract implements NftInterface
      */
     public function getBalance(string $owner): Number
     {
-        return new Number(0);
+        return new Number($this->callMethod('balanceOf', $owner), 0);
     }
 
     /**
@@ -55,7 +55,7 @@ class NFT extends Contract implements NftInterface
      */
     public function getOwner(int|string $tokenId): string
     {
-        return '0x';
+        return $this->callMethod('ownerOf', $tokenId);
     }
 
     /**
@@ -64,7 +64,7 @@ class NFT extends Contract implements NftInterface
      */
     public function getTokenURI(int|string $tokenId): string
     {
-        return 'https://example.com';
+        return $this->callMethod('tokenURI', $tokenId);
     }
 
     /**
@@ -73,7 +73,8 @@ class NFT extends Contract implements NftInterface
      */
     public function getApproved(int|string $tokenId): ?string
     {
-        return '0x';
+        $address = $this->callMethod('getApproved', $tokenId);
+        return '0x0000000000000000000000000000000000000000' === $address ? null : $address;
     }
 
     /**
@@ -84,7 +85,7 @@ class NFT extends Contract implements NftInterface
      */
     public function transfer(string $sender, string $receiver, int|string $tokenId): TransactionSigner
     {
-        return new TransactionSigner('example');
+        return $this->transferFrom($sender, $sender, $receiver, $tokenId);
     }
 
     /**
@@ -100,7 +101,26 @@ class NFT extends Contract implements NftInterface
         string $receiver,
         int|string $tokenId
     ): TransactionSigner {
-        return new TransactionSigner('example');
+        if ($this->getBalance($owner)->toFloat() <= 0) {
+            throw new \RuntimeException(ErrorType::INSUFFICIENT_BALANCE->value);
+        }
+
+        $originalOwner = $this->getOwner($tokenId);
+
+        if (strtolower($originalOwner) !== strtolower($owner)) {
+            throw new \RuntimeException(ErrorType::UNAUTHORIZED_ADDRESS->value);
+        }
+
+        if (strtolower($spender) !== strtolower($owner)) {
+            $approved = $this->getApproved($tokenId);
+            if (strtolower($approved) !== strtolower($spender)) {
+                throw new \RuntimeException(ErrorType::UNAUTHORIZED_ADDRESS->value);
+            }
+        }
+
+        return new TransactionSigner(
+            $this->createTransactionData('transferFrom', $spender, $owner, $receiver, $tokenId)
+        );
     }
 
     /**
@@ -111,6 +131,16 @@ class NFT extends Contract implements NftInterface
      */
     public function approve(string $owner, string $spender, int|string $tokenId): TransactionSigner
     {
-        return new TransactionSigner('example');
+        if ($this->getBalance($owner)->toFloat() <= 0) {
+            throw new \RuntimeException(ErrorType::INSUFFICIENT_BALANCE->value);
+        }
+
+        if (strtolower($this->getOwner($tokenId)) !== strtolower($owner)) {
+            throw new \RuntimeException(ErrorType::UNAUTHORIZED_ADDRESS->value);
+        }
+
+        return new TransactionSigner(
+            $this->createTransactionData('approve', $owner, $spender, $tokenId)
+        );
     }
 }
