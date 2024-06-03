@@ -92,31 +92,6 @@ class Web3 extends Web3Base
     }
 
     /**
-     * @return integer
-     */
-    public function getChainId(): int
-    {
-        try {
-            $chainId = null;
-            $this->net->version(function ($err, $res) use (&$chainId): void {
-                if ($err) {
-                    throw new \Exception($err->getMessage(), $err->getCode());
-                } else {
-                    $chainId = $res;
-                }
-            });
-
-            if (is_string($chainId)) {
-                return intval($chainId);
-            } else {
-                return 0;
-            }
-        } catch (\Throwable $th) {
-            return 0;
-        }
-    }
-
-    /**
      * @param int $blockNumber
      * @return object
      */
