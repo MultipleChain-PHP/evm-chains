@@ -18,6 +18,7 @@
         "test": "phpunit",
         "phpcs": "phpcs --standard=phpcs.xml .",
         "phpcbf": "phpcbf --standard=phpcs.xml .",
+        "coverage": "phpunit --coverage-clover=coverage/clover.xml",
         "phpstan": "phpstan analyse --memory-limit=2G --configuration=phpstan.neon"
     },
     "authors": [
@@ -36,7 +37,8 @@
         "phpunit/phpunit": "^10.5",
         "phpstan/phpstan": "^1.11",
         "squizlabs/php_codesniffer": "^3.10",
-        "slevomat/coding-standard": "^8.15"
+        "slevomat/coding-standard": "^8.15",
+        "phpunit/php-code-coverage": "^10.1"
     },
     "config": {
         "allow-plugins": {
