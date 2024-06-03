@@ -39,7 +39,7 @@ class NetworkConfig extends BaseNetworkConfig
     public string $explorerUrl;
 
     /**
-     * @var array<string,array<string,mixed>>
+     * @var array<string,mixed>
      */
     public array $nativeCurrency;
 
