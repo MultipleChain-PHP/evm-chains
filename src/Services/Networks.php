@@ -100,7 +100,7 @@ class Networks
      */
     public static function findByName(string $name): ?Network
     {
-        return array_reduce(self::getAll(), fn ($c, Network $n) => false !== strpos($n->name, $name) ? $n : $c);
+        return array_reduce(self::getAll(), fn ($c, Network $n) => false !== strpos($n->name ?? '', $name) ? $n : $c);
     }
 
     /**
