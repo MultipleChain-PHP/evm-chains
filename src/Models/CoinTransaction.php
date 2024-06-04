@@ -51,7 +51,7 @@ class CoinTransaction extends Transaction implements CoinTransactionInterface
             return TransactionStatus::PENDING;
         }
 
-        if ($this->getAmount()->toString() != (string) $amount) {
+        if ($this->getAmount()->toFloat() != $amount) {
             return TransactionStatus::FAILED;
         }
 

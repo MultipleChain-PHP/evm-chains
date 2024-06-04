@@ -110,7 +110,7 @@ class TokenTransaction extends ContractTransaction implements TokenTransactionIn
             return TransactionStatus::PENDING;
         }
 
-        if ($this->getAmount()->toString() != (string) $amount) {
+        if ($this->getAmount()->toFloat() != $amount) {
             return TransactionStatus::FAILED;
         }
 
