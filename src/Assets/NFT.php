@@ -32,7 +32,7 @@ class NFT extends Contract implements NftInterface
      */
     public function getName(): string
     {
-        return $this->callMethod('name');
+        return $this->callMethodWithCache('name');
     }
 
     /**
@@ -40,7 +40,7 @@ class NFT extends Contract implements NftInterface
      */
     public function getSymbol(): string
     {
-        return $this->callMethod('symbol');
+        return $this->callMethodWithCache('symbol');
     }
 
     /**
@@ -67,7 +67,7 @@ class NFT extends Contract implements NftInterface
      */
     public function getTokenURI(int|string $tokenId): string
     {
-        return $this->callMethod('tokenURI', $tokenId);
+        return $this->callMethodWithCache('tokenURI', $tokenId);
     }
 
     /**

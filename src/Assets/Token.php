@@ -33,7 +33,7 @@ class Token extends Contract implements TokenInterface
      */
     public function getName(): string
     {
-        return $this->callMethod('name');
+        return $this->callMethodWithCache('name');
     }
 
     /**
@@ -41,7 +41,7 @@ class Token extends Contract implements TokenInterface
      */
     public function getSymbol(): string
     {
-        return $this->callMethod('symbol');
+        return $this->callMethodWithCache('symbol');
     }
 
     /**
@@ -49,7 +49,7 @@ class Token extends Contract implements TokenInterface
      */
     public function getDecimals(): int
     {
-        return (int) hexdec($this->callMethod('decimals'));
+        return (int) hexdec($this->callMethodWithCache('decimals'));
     }
 
     /**
